@@ -15,6 +15,10 @@ func main() {
 	mux.HandleFunc("/home", handlers.HomeHandler) // same as "/"
 	mux.HandleFunc("/about", handlers.AboutHandler)
 	mux.HandleFunc( "/product", handlers.ProductHandler)
+	mux.HandleFunc("/post-get", handlers.PostGet)
+
+	fileServer := http.FileServer(http.Dir("assets"))
+	mux.Handle("/static/", http.StripPrefix("/static/", fileServer)) 
 
 	log.Println("Starting web on port 8080")
 

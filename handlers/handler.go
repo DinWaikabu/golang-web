@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"app-web/entity"
 	"html/template"
 	"log"
 	"net/http"
@@ -10,7 +11,7 @@ import (
 // Homehandler digunakan untuk handle aktifitas yang akan dimuat untuk page home
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
 
-	tmpl, err := template.ParseFiles(path.Join("views","index.html"))
+	tmpl, err := template.ParseFiles(path.Join("views","index.html"), path.Join("views", "layout.html"))
 
 	if err != nil {
 		log.Println(err)
@@ -18,10 +19,17 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data:= map[string]interface{}{
-		"title": "Belajar Golang WEB",
-		"content": "Saya sedang belajar golang web",
-	}
+	// data:= map[string]interface{}{
+	// 	"title": "Belajar Golang WEB",
+	// 	"content": "Saya sedang belajar golang web",
+	// }
+
+	data := []entity.Product{
+				{ID: 1, Nama:  "Laptop Asus", Price:  2500000, Stock:  10},
+				{ID: 2, Nama:  "Laptop Hp", Price: 3000000, Stock:   8},
+				{ID: 3, Nama:  "Macbook", Price:  4000000, Stock:   6},
+				}
+
 
 	err = tmpl.Execute(w, data)
 
@@ -45,5 +53,33 @@ func ProductHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Missing Product Id"))
 		return
 	}
-	w.Write([]byte("Product: " + productId))
+	data := map[string]interface{}{
+		"content": productId,
+	}
+
+	tmpl, err := template.ParseFiles(path.Join("views","product.html"), path.Join("views", "layout.html"))
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "Template not found", http.StatusInternalServerError)
+		return
+	}
+	err = tmpl.Execute(w, data)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "Error executing template", http.StatusInternalServerError)
+		return
+	}
+}
+
+func PostGet(w http.ResponseWriter, r *http.Request) {
+
+	method := r.Method
+	switch method {
+	case "GET":
+		w.Write([]byte("This is a GET request"))	
+	case "POST":
+		w.Write([]byte("This is a POST request"))
+	default:
+		w.WriteHeader(405) // Method Not Allowed
+	}
 }
