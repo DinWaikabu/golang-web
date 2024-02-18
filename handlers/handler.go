@@ -42,7 +42,26 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 
 
 func AboutHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("mario from Tanggerang"))
+
+	tmpl, err := template.ParseFiles(path.Join("views", "about.html"), path.Join("views", "layout.html"))
+	if err != nil {
+		http.Error(w, "Error loading the about page.", http.StatusInternalServerError) 
+		return 
+	}
+	
+	data := struct {
+		Title string
+		Content string
+	}{
+		Title: "About Us",
+		Content: "Kami adalah perusahaan yang bergerak	 dibidang jual beli barang-barang Content",
+	}
+	err = tmpl.Execute(w, data) // Execute Template dari layout dengan data diatas
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "Failed to load the about page.", http.StatusInternalServerError)
+		return	 
+	}
 }
 
 func ProductHandler(w http.ResponseWriter, r *http.Request) {
